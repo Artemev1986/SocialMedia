@@ -29,10 +29,7 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private static final String REGISTRATION_ENDPOINT = "/registration";
     private static final String AUTHENTICATION_ENDPOINT = "/authentication";
-    private static final String ACTIVATE_ENDPOINT = "/activate/*";
-    private static final String RESET_PASSWORD = "/reset-password/**";
-    private static final String CHANGE_PASSWORD = "/change-password/**";
-    private static final String VERIFY_CODE = "/verify-code/**";
+    private static final String ACTUATOR = "/actuator/**";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -52,11 +49,8 @@ public class SecurityConfig {
                         "/swagger-ui/index.html",
                         "/api-docs/**").permitAll()
                 .antMatchers(REGISTRATION_ENDPOINT).permitAll()
-                .antMatchers(ACTIVATE_ENDPOINT).permitAll()
+                .antMatchers(ACTUATOR).permitAll()
                 .antMatchers(AUTHENTICATION_ENDPOINT).permitAll()
-                .antMatchers(RESET_PASSWORD).permitAll()
-                .antMatchers(CHANGE_PASSWORD).permitAll()
-                .antMatchers(VERIFY_CODE).permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint)

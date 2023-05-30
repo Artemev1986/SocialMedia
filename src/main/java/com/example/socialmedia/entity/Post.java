@@ -22,7 +22,8 @@ public class Post extends BaseEntity {
     private String title;
     @Column(name = "text")
     private String text;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Image> images = new ArrayList<>();
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

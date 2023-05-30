@@ -4,6 +4,8 @@ import com.example.socialmedia.entity.Friendship;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.awt.print.Pageable;
+import java.util.List;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
@@ -12,4 +14,10 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
                 () -> new EntityNotFoundException(String.format("Friendship with id (%d) not found", id))
         );
     }
+
+    Friendship getFriendshipByUserIdAndFriendId(long userId, long friendId);
+
+    List<Friendship> getFriendshipsByUserId(long userId);
+
+    List<Friendship> getFriendshipsByFriendId(long friendId, Pageable page);
 }
