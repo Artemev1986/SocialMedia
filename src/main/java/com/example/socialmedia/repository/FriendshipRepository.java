@@ -19,5 +19,5 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     List<Friendship> getFriendshipsByUserId(long userId);
 
-    List<Friendship> getFriendshipsByFriendId(long friendId, Pageable page);
+    //List<Friendship> getFriendshipsByFriendId(long friendId, Pageable page);
 }

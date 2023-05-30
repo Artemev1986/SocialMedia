@@ -20,11 +20,11 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public JwtUserDetails loadUserByUsername(String email) {
         log.debug("finding user by email: {}", email);
-        User user = userRepository.findUserByEmail(email);
+        User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new EntityNotFoundException("User named " + email + " not found");
         }
-        log.debug("user found");
+        log.debug("user with email {} found", email);
         return JwtUserDetails.fromUserToJwtUserDetails(user);
     }
 }

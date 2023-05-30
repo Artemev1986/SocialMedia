@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class PostService {
     }
 
     public ResponseNewPost addPost(RequestPost newPost, MultipartFile[] newImages, String email) throws IOException {
-        User user = findUserByEmail(email);
+        User user = userRepository.findByEmail(email);
 
         Post post = PostMapper.INSTANCE.toPost(newPost, user);
 
@@ -68,7 +67,6 @@ public class PostService {
         }
 
         post.setImages(imageDataList);
-        post.setCreatedAt(LocalDateTime.now());
 
         ResponseNewPost responseNewPost = PostMapper
                 .INSTANCE.toResponseNewPost(postRepository.save(post));
@@ -76,8 +74,11 @@ public class PostService {
         return responseNewPost;
     }
 
-    public ResponseUpdatePost updatePost(RequestPost updatePost, MultipartFile[] newImages, Long[] deleteImageIds, String email) throws IOException {
-        User user = findUserByEmail(email);
+    public ResponseUpdatePost updatePost(RequestPost updatePost,
+                                         MultipartFile[] newImages,
+                                         Long[] deleteImageIds,
+                                         String email) throws IOException {
+        User user = userRepository.findByEmail(email);
         Post post = postRepository.getById(updatePost.getId());
 
         if (!email.equals(post.getUser().getEmail())) {
@@ -145,36 +146,27 @@ public class PostService {
         return friendships.stream().map(Friendship::getFriendId).collect(Collectors.toList());
     }
 
-    public List<ResponsePost> getPostsForSubscriber(Long userId, int from, int size) {
-        List<Long> userIds = getListSubscribeTo(userId);
+    public List<ResponsePost> getPostsForSubscriber(String email, int from, int size) {
+        User user = userRepository.findByEmail(email);
+        List<Long> userIds = getListSubscribeTo(user.getId());
         if (userIds.isEmpty()) {
-            log.info("Getting empty post list for subscriber with id {}", userId);
+            log.info("Getting empty post list for subscriber with id {}", user.getId());
             return new ArrayList<>();
         }
         Pageable page = PageRequest.of(from / size, size, Sort.by("createdAt").descending());
         List<ResponsePost> posts = postRepository.getPostByUsers(userIds, page)
                 .stream().map(PostMapper.INSTANCE::toResponsePost).collect(Collectors.toList());
-        log.info("Getting posts for subscriber with id {}", userId);
+        log.info("Getting posts for subscriber with id {}", user.getId());
         return posts;
     }
 
     public void deletePostById(Long postId, String email) {
-        findUserByEmail(email);
+        userRepository.findByEmail(email);
         Post post = postRepository.getById(postId);
         if (!email.equals(post.getUser().getEmail())) {
             throw new ForbiddenException("This user can't delete this post");
         }
         postRepository.deleteById(postId);
         log.debug("Post with id {} was deleted", postId);
-    }
-
-    private User findUserByEmail(String email) {
-        User user = userRepository.findUserByEmail(email);
-        log.debug("finding user by email: {}", email);
-        if (user == null) {
-            throw new EntityNotFoundException("User named " + email + " not found");
-        }
-        log.debug("user found");
-        return user;
     }
 }

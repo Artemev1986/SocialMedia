@@ -3,7 +3,6 @@ package com.example.socialmedia.service;
 import com.example.socialmedia.entity.Friendship;
 import com.example.socialmedia.entity.StatusFriendship;
 import com.example.socialmedia.entity.User;
-import com.example.socialmedia.exception.ForbiddenException;
 import com.example.socialmedia.repository.FriendshipRepository;
 import com.example.socialmedia.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,72 +27,53 @@ public class UserService {
     }
 
     public User findByEmailAndPassword(String email, String password) {
-        User user = findUserByEmail(email);
+        User user = userRepository.findByEmail(email);
         log.debug("finding user by email {} and password {}", email, password);
         if (passwordEncoder.matches(password, user.getPassword())) {
-            log.debug("user found");
+            log.debug("user with email {} and password found", email);
             return user;
         } else {
             throw new EntityNotFoundException("There is no " + email + " in the database with this password");
         }
     }
 
-    public void addFriend(String email, long friendId) {
-        User user = findUserByEmail(email);
+    public Friendship addFriend(String email, long friendId) {
+        User user = userRepository.findByEmail(email);
         User friend = userRepository.getById(friendId);
         Friendship friendship = new Friendship();
         friendship.setUserId(user.getId());
         friendship.setFriendId(friendId);
-        friendship.setStatus(StatusFriendship.SUBSCRIBE);
+        Friendship oldFriendship = friendshipRepository.getFriendshipByUserIdAndFriendId(friendId, user.getId());
+        if (oldFriendship == null) {
+            friendship.setStatus(StatusFriendship.SUBSCRIBE);
+        } else {
+            friendship.setStatus(StatusFriendship.FRIENDSHIP);
+            oldFriendship.setStatus(StatusFriendship.FRIENDSHIP);
+            friendshipRepository.save(oldFriendship);
+            log.debug("user {} subscribed on {} and get status FRIENDSHIP", user, friend);
+        }
         friendshipRepository.save(friendship);
         log.debug("user {} subscribed on {}", user, friend);
+        return friendship;
     }
 
-    public void confirmFriendship(String email, long friendshipId) {
-        User user = findUserByEmail(email);
-        Friendship friendship = friendshipRepository.getById(friendshipId);
-        if (!friendship.getFriendId().equals(user.getId())) {
-            throw new ForbiddenException(
-                    String.format("User with id (%d) can't confirm friendship with id (%d)", user.getId(), friendshipId));
+    public void declineFriendship(String email, long friendId) {
+        User user = userRepository.findByEmail(email);
+        Friendship opponentFriendship = friendshipRepository.getFriendshipByUserIdAndFriendId(friendId, user.getId());
+        if (opponentFriendship != null) {
+            opponentFriendship.setStatus(StatusFriendship.DECLINE);
+            friendshipRepository.save(opponentFriendship);
         }
-        friendship.setStatus(StatusFriendship.FRIENDSHIP);
-        friendshipRepository.save(friendship);
 
-        Friendship newFriendship = new Friendship();
-        newFriendship.setUserId(user.getId());
-        newFriendship.setFriendId(friendship.getUserId());
-        newFriendship.setStatus(StatusFriendship.FRIENDSHIP);
-        friendshipRepository.save(newFriendship);
+        Friendship friendship = friendshipRepository.getFriendshipByUserIdAndFriendId(user.getId(), friendId);
+        if (friendship != null) {
+            friendshipRepository.delete(friendship);
+        }
 
-        log.debug("user {} confirm friendship {}", user, friendship);
+        if (opponentFriendship == null && friendship == null) {
+            throw new EntityNotFoundException(
+                    String.format("there is no relationship between user (%d) and user (%d)", user.getId(), friendId));
+        }
+        log.debug("user {} decline friendship by user with id {}", user, friendId);
     }
-
-    public void declineFriendship(String email, long friendshipId) {
-        User user = findUserByEmail(email);
-        Friendship friendship = friendshipRepository.getById(friendshipId);
-        if (!friendship.getFriendId().equals(user.getId())) {
-            throw new ForbiddenException(
-                    String.format("User with id (%d) can't decline friendship with id (%d)", user.getId(), friendshipId));
-        }
-        friendship.setStatus(StatusFriendship.DECLINE);
-        friendshipRepository.save(friendship);
-
-        Friendship confirmedFriendship = friendshipRepository.getFriendshipByUserIdAndFriendId(user.getId(), friendship.getUserId());
-        if (confirmedFriendship != null) {
-            friendshipRepository.delete(confirmedFriendship);
-        }
-        log.debug("user {} decline friendship {}", user, friendship);
-    }
-
-    private User findUserByEmail(String email) {
-        User user = userRepository.findUserByEmail(email);
-        log.debug("finding user by email: {}", email);
-        if (user == null) {
-            throw new EntityNotFoundException("User named " + email + " not found");
-        }
-        log.debug("user found");
-        return user;
-    }
-
-
 }

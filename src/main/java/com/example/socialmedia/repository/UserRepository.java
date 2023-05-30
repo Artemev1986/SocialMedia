@@ -13,4 +13,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 () -> new EntityNotFoundException(String.format("User with id (%d) not found", id))
         );
     }
+
+    default User findByEmail(String email) {
+        User user = findUserByEmail(email);
+        if (user == null) {
+            throw new EntityNotFoundException(String.format("User with email (%s) not found", email));
+        }
+        return user;
+    }
 }

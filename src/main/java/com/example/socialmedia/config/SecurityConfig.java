@@ -27,9 +27,6 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final RestAccessDeniedHandler accessDeniedHandler;
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
-    private static final String REGISTRATION_ENDPOINT = "/registration";
-    private static final String AUTHENTICATION_ENDPOINT = "/authentication";
-    private static final String ACTUATOR = "/actuator/**";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,9 +45,12 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui/index.html",
                         "/api-docs/**").permitAll()
-                .antMatchers(REGISTRATION_ENDPOINT).permitAll()
-                .antMatchers(ACTUATOR).permitAll()
-                .antMatchers(AUTHENTICATION_ENDPOINT).permitAll()
+                .antMatchers("/registration").permitAll()
+                .antMatchers("/authentication").permitAll()
+                .antMatchers("/users**/**").permitAll()
+                .antMatchers("/messages**/**").permitAll()
+                .antMatchers("/posts**/**").permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint)

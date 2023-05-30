@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class ResponseUpdatePost {
     private Long id;
     private String title;
+    private UserShortDto user;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
