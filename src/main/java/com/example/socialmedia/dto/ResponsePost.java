@@ -13,7 +13,7 @@ public class ResponsePost {
     private String title;
     private String text;
     private UserShortDto user;
-    private List<ImageDto> images;
+    private List<Long> imageIds;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

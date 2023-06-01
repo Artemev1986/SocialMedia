@@ -1,12 +1,10 @@
 package com.example.socialmedia.mapper;
 
-import com.example.socialmedia.dto.*;
+import com.example.socialmedia.dto.ImageDto;
 import com.example.socialmedia.entity.Image;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 @Mapper
 public interface ImageMapper {
@@ -16,6 +14,4 @@ public interface ImageMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
     ImageDto toImageDto(Image image);
-
-    List<ImageDto> toImageDtos(List<Image> images);
 }

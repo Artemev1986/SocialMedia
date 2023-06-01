@@ -31,17 +31,6 @@ public class UserService {
         return UserMapper.INSTANCE.toUserDto(user);
     }
 
-    public User findByEmailAndPassword(String email, String password) {
-        User user = userRepository.findByEmail(email);
-        log.debug("finding user by email {} and password {}", email, password);
-        if (passwordEncoder.matches(password, user.getPassword())) {
-            log.debug("user with email {} and password found", email);
-            return user;
-        } else {
-            throw new EntityNotFoundException("There is no " + email + " in the database with this password");
-        }
-    }
-
     public Friendship addFriend(String email, long friendId) {
         User user = userRepository.findByEmail(email);
         User friend = userRepository.getById(friendId);

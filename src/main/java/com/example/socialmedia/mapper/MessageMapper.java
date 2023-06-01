@@ -15,6 +15,7 @@ public interface MessageMapper {
 
     MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
+    @Mapping(expression = "java(null)", target = "id")
     @Mapping(source = "newMessage.text", target = "text")
     @Mapping(source = "sender", target = "sender")
     @Mapping(source = "recipient", target = "recipient")

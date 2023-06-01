@@ -1,16 +1,15 @@
 package com.example.socialmedia.service;
 
 import com.example.socialmedia.dto.RequestPost;
-import com.example.socialmedia.dto.ResponseNewPost;
 import com.example.socialmedia.dto.ResponsePost;
-import com.example.socialmedia.dto.ResponseUpdatePost;
-import com.example.socialmedia.entity.Friendship;
+import com.example.socialmedia.entity.BaseEntity;
 import com.example.socialmedia.entity.Image;
 import com.example.socialmedia.entity.Post;
 import com.example.socialmedia.entity.User;
 import com.example.socialmedia.exception.ForbiddenException;
 import com.example.socialmedia.mapper.PostMapper;
 import com.example.socialmedia.repository.FriendshipRepository;
+import com.example.socialmedia.repository.ImageRepository;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +34,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final FriendshipRepository friendshipRepository;
+    private final ImageRepository imageRepository;
 
     public ResponsePost findById(long id) {
         Post post = postRepository.getById(id);
@@ -45,7 +44,7 @@ public class PostService {
         return responsePost;
     }
 
-    public ResponseNewPost addPost(RequestPost newPost, MultipartFile[] newImages, String email) throws IOException {
+    public ResponsePost addPost(RequestPost newPost, MultipartFile[] newImages, String email) throws IOException {
         User user = userRepository.findByEmail(email);
 
         Post post = PostMapper.INSTANCE.toPost(newPost, user);
@@ -66,15 +65,15 @@ public class PostService {
             }
         }
 
-        post.setImages(imageDataList);
-
-        ResponseNewPost responseNewPost = PostMapper
-                .INSTANCE.toResponseNewPost(postRepository.save(post));
+        post.setImageIds(imageDataList.stream().map(BaseEntity::getId).collect(Collectors.toList()));
+        ResponsePost responseNewPost = PostMapper
+                .INSTANCE.toResponsePost(postRepository.save(post));
+        imageRepository.saveAll(imageDataList);
         log.debug("Added new post: {} by user: {}", post, user);
         return responseNewPost;
     }
 
-    public ResponseUpdatePost updatePost(RequestPost updatePost,
+    public ResponsePost updatePost(RequestPost updatePost,
                                          MultipartFile[] newImages,
                                          Long[] deleteImageIds,
                                          String email) throws IOException {
@@ -85,18 +84,17 @@ public class PostService {
             throw new ForbiddenException("This user can't update this post");
         }
 
-        List<Image> images = post.getImages();
-        List<Image> imagesToRemove = new ArrayList<>();
+        List<Long> imageIds = imageRepository.getImagesByPost(post);
+        List<Long> imageIdsToRemove = new ArrayList<>();
 
         if (deleteImageIds != null && deleteImageIds.length > 0) {
-            List<Long> imageIdsToDelete = Arrays.asList(deleteImageIds);
-            for (Image image: images) {
-                if (imageIdsToDelete.contains(image.getId())) {
-                    imagesToRemove.add(image);
+            for (Long imageId: deleteImageIds) {
+                if (imageIds.contains(imageId)) {
+                    imageIdsToRemove.add(imageId);
                 }
             }
-            if (!imagesToRemove.isEmpty()) {
-                images.removeAll(imagesToRemove);
+            if (!imageIdsToRemove.isEmpty()) {
+                imageRepository.deleteAllById(imageIdsToRemove);
             }
         }
 
@@ -118,8 +116,10 @@ public class PostService {
 
         if (!imageDataList.isEmpty())
         {
-            images.addAll(imageDataList);
+            imageRepository.saveAll(imageDataList);
         }
+
+        post.setImageIds(imageRepository.getImagesByPost(post));
 
         if (!updatePost.getTitle().isEmpty()) {
             post.setTitle(updatePost.getTitle());
@@ -129,26 +129,17 @@ public class PostService {
             post.setText(updatePost.getText());
         }
 
-        if (!images.isEmpty()) {
-            post.setImages(images);
-        }
-
         post.setUpdatedAt(LocalDateTime.now());
 
-        ResponseUpdatePost responseUpdatePost = PostMapper
-                .INSTANCE.toResponseUpdatedPost(postRepository.save(post));
+        ResponsePost responseUpdatePost = PostMapper
+                .INSTANCE.toResponsePost(postRepository.save(post));
         log.debug("Updated post: {} by user: {}", post, user);
         return responseUpdatePost;
     }
 
-    private List<Long> getListSubscribeTo(Long userId) {
-        List<Friendship> friendships = friendshipRepository.getFriendshipsByUserId(userId);
-        return friendships.stream().map(Friendship::getFriendId).collect(Collectors.toList());
-    }
-
     public List<ResponsePost> getPostsForSubscriber(String email, int from, int size) {
         User user = userRepository.findByEmail(email);
-        List<Long> userIds = getListSubscribeTo(user.getId());
+        List<Long> userIds = friendshipRepository.getFriendshipsByUserId(user.getId());
         if (userIds.isEmpty()) {
             log.info("Getting empty post list for subscriber with id {}", user.getId());
             return new ArrayList<>();

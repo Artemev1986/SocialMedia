@@ -2,9 +2,9 @@ package com.example.socialmedia.repository;
 
 import com.example.socialmedia.entity.Friendship;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.EntityNotFoundException;
-import java.awt.print.Pageable;
 import java.util.List;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
@@ -17,7 +17,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     Friendship getFriendshipByUserIdAndFriendId(long userId, long friendId);
 
-    List<Friendship> getFriendshipsByUserId(long userId);
-
-    //List<Friendship> getFriendshipsByFriendId(long friendId, Pageable page);
+    @Query("SELECT fr.userId FROM Friendship fr WHERE fr.userId = :userId")
+    List<Long> getFriendshipsByUserId(long userId);
 }

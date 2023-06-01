@@ -1,6 +1,7 @@
 package com.example.socialmedia.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.persistence.MappedSuperclass;
 import java.util.Objects;
 
 @Getter
+@Setter
 @MappedSuperclass
 public class BaseEntity {
     @Id

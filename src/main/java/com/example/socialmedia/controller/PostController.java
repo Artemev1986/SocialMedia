@@ -2,6 +2,7 @@ package com.example.socialmedia.controller;
 
 import com.example.socialmedia.dto.*;
 import com.example.socialmedia.entity.Image;
+import com.example.socialmedia.security.JwtProvider;
 import com.example.socialmedia.service.ImageService;
 import com.example.socialmedia.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -30,47 +30,46 @@ public class PostController {
 
     private final PostService postService;
     private final ImageService imageService;
+    private final JwtProvider jwtProvider;
     private static final String AUTHORIZATION = "Authorization";
 
 
     @PostMapping
-    ResponseEntity<ResponseNewPost> addPost(@RequestPart @NotBlank String title,
+    ResponseEntity<ResponsePost> addPost(@RequestPart @NotBlank String title,
                                             @RequestPart @NotBlank String text,
                                             @RequestPart MultipartFile[] images,
-                                            @RequestParam @NotBlank @Email String email,
                                             @RequestHeader(AUTHORIZATION) String token) throws IOException {
 
         RequestPost newPost = new RequestPost();
         newPost.setTitle(title);
         newPost.setText(text);
-        ResponseNewPost postDto = postService.addPost(newPost, images, email);
+        String email = jwtProvider.getEmailFromToken(token.substring(7));
+        ResponsePost postDto = postService.addPost(newPost, images, email);
 
         return new ResponseEntity<>(postDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<ResponseUpdatePost> updatePost(@PathVariable Long postId,
+    public ResponseEntity<ResponsePost> updatePost(@PathVariable Long postId,
                                                          @RequestPart(required = false) @NotBlank String title,
                                                          @RequestPart(required = false) @NotBlank String text,
                                                          @RequestPart(required = false) MultipartFile[] images,
                                                          @RequestParam(required = false) Long[] deleteImageIds,
-                                                         @RequestHeader(AUTHORIZATION) String token,
-                                                         @RequestParam @NotBlank @Email String email) throws IOException {
+                                                         @RequestHeader(AUTHORIZATION) String token) throws IOException {
 
         RequestPost updatePost = new RequestPost();
         updatePost.setId(postId);
         updatePost.setTitle(title);
         updatePost.setText(text);
 
-        ResponseUpdatePost updatedPost = postService.updatePost(updatePost, images, deleteImageIds, email);
+        String email = jwtProvider.getEmailFromToken(token.substring(7));
+        ResponsePost updatedPost = postService.updatePost(updatePost, images, deleteImageIds, email);
 
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ResponsePost> getPostById(@RequestHeader(AUTHORIZATION) String token,
-                                                    @NotBlank @Email @RequestParam String email,
-                                                    @PathVariable Long postId) {
+    public ResponseEntity<ResponsePost> getPostById(@PathVariable Long postId) {
 
         ResponsePost responsePost = postService.findById(postId);
 
@@ -78,9 +77,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/images/{imageId}")
-    public ResponseEntity<Resource> downloadImage(@RequestHeader(AUTHORIZATION) String token,
-                                                  @NotBlank @Email @RequestParam String email,
-                                                  @PathVariable Long postId,
+    public ResponseEntity<Resource> downloadImage(@PathVariable Long postId,
                                                   @PathVariable Long imageId) {
 
         Image image = imageService.getById(imageId, postId);
@@ -95,9 +92,9 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@RequestHeader(AUTHORIZATION) String token,
-                                           @NotBlank @Email @RequestParam String email,
                                            @PathVariable Long postId) {
 
+        String email = jwtProvider.getEmailFromToken(token.substring(7));
         postService.deletePostById(postId, email);
 
         return ResponseEntity.ok().build();
@@ -105,10 +102,10 @@ public class PostController {
 
     @GetMapping("/subscribe")
     public ResponseEntity<List<ResponsePost>> getPostsForSubscriber(@RequestHeader(AUTHORIZATION) String token,
-                                                                    @NotBlank @Email @RequestParam String email,
                                                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                                     @Positive @RequestParam(defaultValue = "10") Integer size) {
 
+        String email = jwtProvider.getEmailFromToken(token.substring(7));
         List<ResponsePost> posts = postService.getPostsForSubscriber(email, from, size);
         if (posts.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);

@@ -23,11 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtProvider implements InitializingBean {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
-
     private final String base64Secret;
     private final long tokenValidityInMilliseconds;
     private final long tokenValidityInMillisecondsForRememberMe;
@@ -39,8 +34,8 @@ public class JwtProvider implements InitializingBean {
                        @Value("${jwt.token-validity-in-seconds}") long tokenValidityInMilliseconds,
                        @Value("${jwt.token-validity-in-seconds-for-remember-me}") long tokenValidityInMillisecondsForRememberMe) {
         this.base64Secret = base64Secret;
-        this.tokenValidityInMilliseconds = tokenValidityInMilliseconds;
-        this.tokenValidityInMillisecondsForRememberMe = tokenValidityInMillisecondsForRememberMe;
+        this.tokenValidityInMilliseconds = tokenValidityInMilliseconds * 1000;
+        this.tokenValidityInMillisecondsForRememberMe = tokenValidityInMillisecondsForRememberMe * 1000;
     }
 
     public String createToken(Authentication authentication, boolean rememberMe) {

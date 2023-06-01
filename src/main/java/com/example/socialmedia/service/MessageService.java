@@ -78,7 +78,7 @@ public class MessageService {
     public List<ResponseMessage> getInMessagesByUser(String email, int from, int size) {
         User user = userRepository.findByEmail(email);
         Pageable page = PageRequest.of(from / size, size, Sort.by("createdAt").descending());
-        List<ResponseMessage> messages = messageRepository.getMessagesBySender(user, page)
+        List<ResponseMessage> messages = messageRepository.getMessagesByRecipient(user, page)
                 .stream().map(MessageMapper.INSTANCE::toResponseMessage).collect(Collectors.toList());
         log.info("Getting user's {} incoming messages", user);
         return messages;

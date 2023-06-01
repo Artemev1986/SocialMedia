@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.EntityNotFoundException;
@@ -21,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 public class ErrorHandler {
     private final ApiError apiError = new ApiError();
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {MethodArgumentNotValidException.class, CurrencyNotValidException.class})
     public ResponseEntity<?> handleMethodArgumentNotValid(final Throwable e) {
         apiError.setMessage(e.getMessage());
@@ -31,7 +29,6 @@ public class ErrorHandler {
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler
     public ResponseEntity<?> handleNotFoundException(final EntityNotFoundException e) {
         apiError.setMessage(e.getMessage());
@@ -42,7 +39,6 @@ public class ErrorHandler {
     }
 
 
-    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler
     public ResponseEntity<?> handleSqlException(final SQLException e) {
         apiError.setMessage(e.getMessage());
@@ -52,7 +48,6 @@ public class ErrorHandler {
         return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
     }
 
-    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler
     public ResponseEntity<?> handleForbiddenExceptions(final ForbiddenException e) {
         apiError.setMessage(e.getMessage());
