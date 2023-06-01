@@ -13,5 +13,6 @@ public class AuthenticationRequest {
     private String email;
     @NotBlank
     private String password;
+    private Boolean isRememberMe;
 }
 

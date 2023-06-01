@@ -1,6 +1,5 @@
 package com.example.socialmedia.controller;
 
-import com.example.socialmedia.controller.util.ControllerUtil;
 import com.example.socialmedia.dto.NewMessage;
 import com.example.socialmedia.dto.ResponseMessage;
 import com.example.socialmedia.service.MessageService;
@@ -22,7 +21,6 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
-    private final ControllerUtil controllerUtil;
     private static final String AUTHORIZATION = "Authorization";
 
     @PostMapping
@@ -30,7 +28,6 @@ public class MessageController {
                                                        @RequestHeader(AUTHORIZATION) String token,
                                                        @NotBlank @Email @RequestParam String email) {
 
-        controllerUtil.validateTokenAndEmail(email, token);
         ResponseMessage responseMessage = messageService.addMessage(email, newMessage);
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
@@ -42,7 +39,6 @@ public class MessageController {
                                                                          @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                                          @Positive @RequestParam(defaultValue = "10") Integer size) {
 
-        controllerUtil.validateTokenAndEmail(email, token);
         List<ResponseMessage> messages = messageService.getMessagesBetweenUsers(email, friendId, from, size);
         if (messages.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
@@ -56,7 +52,6 @@ public class MessageController {
                                                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
 
-        controllerUtil.validateTokenAndEmail(email, token);
         List<ResponseMessage> messages = messageService.getOutMessagesByUser(email, from, size);
         if (messages.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
@@ -70,7 +65,6 @@ public class MessageController {
                                                                      @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                                      @Positive @RequestParam(defaultValue = "10") Integer size) {
 
-        controllerUtil.validateTokenAndEmail(email, token);
         List<ResponseMessage> messages = messageService.getInMessagesByUser(email, from, size);
         if (messages.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
@@ -83,7 +77,6 @@ public class MessageController {
                                                           @RequestHeader(AUTHORIZATION) String token,
                                                           @NotBlank @Email @RequestParam String email) {
 
-        controllerUtil.validateTokenAndEmail(email, token);
         ResponseMessage message = messageService.getMessageById(email, messageId);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }

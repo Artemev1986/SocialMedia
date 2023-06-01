@@ -1,9 +1,9 @@
-package com.example.socialmedia.config;
+package com.example.socialmedia.security.config;
 
-import com.example.socialmedia.security.JwtFilter;
+import com.example.socialmedia.security.JwtConfigurer;
+import com.example.socialmedia.security.JwtProvider;
 import com.example.socialmedia.security.RestAccessDeniedHandler;
 import com.example.socialmedia.security.RestAuthenticationEntryPoint;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,21 +12,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-
-    private final JwtFilter jwtFilter;
-    private final RestAccessDeniedHandler accessDeniedHandler;
-    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtProvider jwtProvider;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,24 +35,19 @@ public class SecurityConfig {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**",
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/webjars/**",
-                        "/swagger-ui/index.html",
-                        "/api-docs/**").permitAll()
+                .antMatchers(
+                        "/swagger-resources**/**",
+                        "/swagger-ui**/**",
+                        "/v*/api-docs/**").permitAll()
                 .antMatchers("/registration").permitAll()
                 .antMatchers("/authentication").permitAll()
-                .antMatchers("/users**/**").permitAll()
-                .antMatchers("/messages**/**").permitAll()
-                .antMatchers("/posts**/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
-                .anyRequest().authenticated().and()
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(authenticationEntryPoint)
+                .anyRequest().authenticated()
+                .and().exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(restAccessDeniedHandler)
                 .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .apply(new JwtConfigurer(jwtProvider));
         return http.build();
     }
 

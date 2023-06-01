@@ -1,8 +1,11 @@
 package com.example.socialmedia.service;
 
+import com.example.socialmedia.dto.RegistrationRequest;
+import com.example.socialmedia.dto.UserDto;
 import com.example.socialmedia.entity.Friendship;
 import com.example.socialmedia.entity.StatusFriendship;
 import com.example.socialmedia.entity.User;
+import com.example.socialmedia.mapper.UserMapper;
 import com.example.socialmedia.repository.FriendshipRepository;
 import com.example.socialmedia.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +24,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final FriendshipRepository friendshipRepository;
 
-    public void registerUser(User user) {
+    public UserDto registerUser(RegistrationRequest registrationRequest) {
+        User user = UserMapper.INSTANCE.registrationToUser(registrationRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        return UserMapper.INSTANCE.toUserDto(user);
     }
 
     public User findByEmailAndPassword(String email, String password) {

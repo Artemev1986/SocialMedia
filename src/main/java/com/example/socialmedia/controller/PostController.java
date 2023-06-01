@@ -1,6 +1,5 @@
 package com.example.socialmedia.controller;
 
-import com.example.socialmedia.controller.util.ControllerUtil;
 import com.example.socialmedia.dto.*;
 import com.example.socialmedia.entity.Image;
 import com.example.socialmedia.service.ImageService;
@@ -31,7 +30,6 @@ public class PostController {
 
     private final PostService postService;
     private final ImageService imageService;
-    private final ControllerUtil controllerUtil;
     private static final String AUTHORIZATION = "Authorization";
 
 
@@ -41,8 +39,6 @@ public class PostController {
                                             @RequestPart MultipartFile[] images,
                                             @RequestParam @NotBlank @Email String email,
                                             @RequestHeader(AUTHORIZATION) String token) throws IOException {
-
-        controllerUtil.validateTokenAndEmail(email, token);
 
         RequestPost newPost = new RequestPost();
         newPost.setTitle(title);
@@ -60,7 +56,6 @@ public class PostController {
                                                          @RequestParam(required = false) Long[] deleteImageIds,
                                                          @RequestHeader(AUTHORIZATION) String token,
                                                          @RequestParam @NotBlank @Email String email) throws IOException {
-        controllerUtil.validateTokenAndEmail(email, token);
 
         RequestPost updatePost = new RequestPost();
         updatePost.setId(postId);
@@ -76,7 +71,6 @@ public class PostController {
     public ResponseEntity<ResponsePost> getPostById(@RequestHeader(AUTHORIZATION) String token,
                                                     @NotBlank @Email @RequestParam String email,
                                                     @PathVariable Long postId) {
-        controllerUtil.validateTokenAndEmail(email, token);
 
         ResponsePost responsePost = postService.findById(postId);
 
@@ -88,7 +82,6 @@ public class PostController {
                                                   @NotBlank @Email @RequestParam String email,
                                                   @PathVariable Long postId,
                                                   @PathVariable Long imageId) {
-        controllerUtil.validateTokenAndEmail(email, token);
 
         Image image = imageService.getById(imageId, postId);
 
@@ -104,7 +97,6 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@RequestHeader(AUTHORIZATION) String token,
                                            @NotBlank @Email @RequestParam String email,
                                            @PathVariable Long postId) {
-        controllerUtil.validateTokenAndEmail(email, token);
 
         postService.deletePostById(postId, email);
 
@@ -117,7 +109,6 @@ public class PostController {
                                                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                                     @Positive @RequestParam(defaultValue = "10") Integer size) {
 
-        controllerUtil.validateTokenAndEmail(email, token);
         List<ResponsePost> posts = postService.getPostsForSubscriber(email, from, size);
         if (posts.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
