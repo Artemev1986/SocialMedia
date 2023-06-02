@@ -36,9 +36,9 @@ public class PostController {
 
     @PostMapping
     ResponseEntity<ResponsePost> addPost(@RequestPart @NotBlank String title,
-                                            @RequestPart @NotBlank String text,
-                                            @RequestPart MultipartFile[] images,
-                                            @RequestHeader(AUTHORIZATION) String token) throws IOException {
+                                         @RequestPart @NotBlank String text,
+                                         @RequestPart MultipartFile[] images,
+                                         @RequestHeader(AUTHORIZATION) String token) throws IOException {
 
         RequestPost newPost = new RequestPost();
         newPost.setTitle(title);
@@ -51,11 +51,11 @@ public class PostController {
 
     @PutMapping("/{postId}")
     public ResponseEntity<ResponsePost> updatePost(@PathVariable Long postId,
-                                                         @RequestPart(required = false) @NotBlank String title,
-                                                         @RequestPart(required = false) @NotBlank String text,
-                                                         @RequestPart(required = false) MultipartFile[] images,
-                                                         @RequestParam(required = false) Long[] deleteImageIds,
-                                                         @RequestHeader(AUTHORIZATION) String token) throws IOException {
+                                                   @RequestPart(required = false) @NotBlank String title,
+                                                   @RequestPart(required = false) @NotBlank String text,
+                                                   @RequestPart(required = false) MultipartFile[] images,
+                                                   @RequestParam(required = false) Long[] deleteImageIds,
+                                                   @RequestHeader(AUTHORIZATION) String token) throws IOException {
 
         RequestPost updatePost = new RequestPost();
         updatePost.setId(postId);
@@ -100,7 +100,7 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/subscribe")
+    @GetMapping("/subscriptions")
     public ResponseEntity<List<ResponsePost>> getPostsForSubscriber(@RequestHeader(AUTHORIZATION) String token,
                                                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                                     @Positive @RequestParam(defaultValue = "10") Integer size) {

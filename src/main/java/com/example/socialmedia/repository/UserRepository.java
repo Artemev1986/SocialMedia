@@ -1,9 +1,13 @@
 package com.example.socialmedia.repository;
 
+import com.example.socialmedia.entity.Post;
 import com.example.socialmedia.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByEmail(String email);
@@ -21,4 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         }
         return user;
     }
+
+    @Query("SELECT user FROM User user WHERE user.id IN :userIds")
+    List<User> getUsersByUserList(List<Long> userIds);
 }

@@ -6,6 +6,7 @@ import com.example.socialmedia.entity.Friendship;
 import com.example.socialmedia.entity.Message;
 import com.example.socialmedia.entity.StatusFriendship;
 import com.example.socialmedia.entity.User;
+import com.example.socialmedia.exception.ForbiddenException;
 import com.example.socialmedia.mapper.MessageMapper;
 import com.example.socialmedia.repository.FriendshipRepository;
 import com.example.socialmedia.repository.MessageRepository;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,16 +36,20 @@ public class MessageService {
         User sender = userRepository.findByEmail(email);
         User recipient = userRepository.getById(newMessage.getRecipientId());
 
+        if (sender.equals(recipient)) {
+            throw new ForbiddenException(String.format("user1 (%d) and user2 (%d) are the same",
+                    sender.getId(), recipient.getId()));
+        }
         Friendship friendship = friendshipRepository
                 .getFriendshipByUserIdAndFriendId(sender.getId(), newMessage.getRecipientId());
 
         if (friendship == null) {
-            throw new EntityNotFoundException(String.format("there is no relationship between user (%d) and user (%d)",
+            throw new ForbiddenException(String.format("there is no relationship between user (%d) and user (%d)",
                             sender.getId(), recipient.getId()));
         }
 
         if (friendship.getStatus() != StatusFriendship.FRIENDSHIP) {
-            throw new EntityNotFoundException(String.format("there is no friendship between user (%d) and user (%d)",
+            throw new ForbiddenException(String.format("there is no friendship between user (%d) and user (%d)",
                     sender.getId(), recipient.getId()));
         }
 
@@ -88,7 +92,7 @@ public class MessageService {
         User user = userRepository.findByEmail(email);
         Message message = messageRepository.getById(messageId);
         if (!(user.getId().equals(message.getSender().getId()) || user.getId().equals(message.getRecipient().getId()))) {
-            throw new EntityNotFoundException(String.format("user with email (%s) does not have permission to read message with id (%d)",
+            throw new ForbiddenException(String.format("user with email (%s) does not have permission to read message with id (%d)",
                     email, messageId));
         }
         log.debug("user with email {} read message with id {}", email, messageId);

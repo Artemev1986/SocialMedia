@@ -2,7 +2,6 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.dto.RequestPost;
 import com.example.socialmedia.dto.ResponsePost;
-import com.example.socialmedia.entity.BaseEntity;
 import com.example.socialmedia.entity.Image;
 import com.example.socialmedia.entity.Post;
 import com.example.socialmedia.entity.User;
@@ -38,7 +37,8 @@ public class PostService {
 
     public ResponsePost findById(long id) {
         Post post = postRepository.getById(id);
-
+        List<Long> imageIds = imageRepository.getImagesByPost(post);
+        post.setImageIds(imageIds);
         ResponsePost responsePost = PostMapper.INSTANCE.toResponsePost(post);
         log.debug("Got post {}", responsePost);
         return responsePost;
@@ -65,10 +65,11 @@ public class PostService {
             }
         }
 
-        post.setImageIds(imageDataList.stream().map(BaseEntity::getId).collect(Collectors.toList()));
-        ResponsePost responseNewPost = PostMapper
-                .INSTANCE.toResponsePost(postRepository.save(post));
+        postRepository.save(post);
         imageRepository.saveAll(imageDataList);
+        post.setImageIds(imageDataList.stream().map(Image::getId).collect(Collectors.toList()));
+        ResponsePost responseNewPost = PostMapper
+                .INSTANCE.toResponsePost(post);
         log.debug("Added new post: {} by user: {}", post, user);
         return responseNewPost;
     }
@@ -139,14 +140,16 @@ public class PostService {
 
     public List<ResponsePost> getPostsForSubscriber(String email, int from, int size) {
         User user = userRepository.findByEmail(email);
-        List<Long> userIds = friendshipRepository.getFriendshipsByUserId(user.getId());
+        List<Long> userIds = friendshipRepository.getMainSubscriptionsByUserId(user.getId());
         if (userIds.isEmpty()) {
             log.info("Getting empty post list for subscriber with id {}", user.getId());
             return new ArrayList<>();
         }
         Pageable page = PageRequest.of(from / size, size, Sort.by("createdAt").descending());
-        List<ResponsePost> posts = postRepository.getPostByUsers(userIds, page)
-                .stream().map(PostMapper.INSTANCE::toResponsePost).collect(Collectors.toList());
+        List<ResponsePost> posts = postRepository.getPostByUsers(userIds, page).stream().map(post -> {
+            post.setImageIds(imageRepository.getImagesByPost(post));
+            return PostMapper.INSTANCE.toResponsePost(post);
+                }).collect(Collectors.toList());
         log.info("Getting posts for subscriber with id {}", user.getId());
         return posts;
     }
