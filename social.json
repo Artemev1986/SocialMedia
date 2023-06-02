@@ -1,0 +1,2656 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Post Controller",
+      "description": "API endpoints for managing posts and images"
+    },
+    {
+      "name": "User Controller",
+      "description": "API endpoints for managing users, friendships, and messages"
+    },
+    {
+      "name": "Authentication Controller",
+      "description": "API endpoints for user authentication and registration"
+    }
+  ],
+  "paths": {
+    "/api/users/friends/{friendId}": {
+      "put": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Add a friendship",
+        "operationId": "addFriendship",
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "path",
+            "description": "The ID of the friend",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Friendship added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "userId": {
+                      "type": "integer",
+                      "description": "User ID",
+                      "format": "int64"
+                    },
+                    "friendId": {
+                      "type": "integer",
+                      "description": "Friend ID",
+                      "format": "int64"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Friendship status",
+                      "enum": [
+                        "SUBSCRIBE",
+                        "FRIENDSHIP",
+                        "DECLINE"
+                      ]
+                    }
+                  },
+                  "description": "Friendship entity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User or friend not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Decline a friendship",
+        "operationId": "declineFriendship",
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "path",
+            "description": "The ID of the friend",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Friendship declined successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{postId}": {
+      "get": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Get a post by ID",
+        "operationId": "getPostById",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Post ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Post title"
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Post text"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "imageIds": {
+                      "type": "array",
+                      "description": "List of image IDs",
+                      "items": {
+                        "type": "integer",
+                        "description": "List of image IDs",
+                        "format": "int64"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "description": "Last update timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Response DTO for a post"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Update an existing post",
+        "operationId": "updatePost",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "deleteImageIds",
+            "in": "query",
+            "description": "The IDs of images to delete",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The updated title of the post"
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "The updated text of the post"
+                  },
+                  "images": {
+                    "type": "array",
+                    "description": "The updated images associated with the post",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Post updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Post ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Post title"
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Post text"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "imageIds": {
+                      "type": "array",
+                      "description": "List of image IDs",
+                      "items": {
+                        "type": "integer",
+                        "description": "List of image IDs",
+                        "format": "int64"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "description": "Last update timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Response DTO for a post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Delete a post",
+        "operationId": "deletePost",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/messages": {
+      "post": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Send a message",
+        "operationId": "sendMessage",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "recipientId",
+                  "text"
+                ],
+                "type": "object",
+                "properties": {
+                  "recipientId": {
+                    "type": "integer",
+                    "description": "Recipient identifier",
+                    "format": "int64"
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "Message text"
+                  }
+                },
+                "description": "The new message object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Message sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Message ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Message text",
+                      "example": "Hello, how are you?"
+                    },
+                    "sender": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "recipient": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Represents a response message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration": {
+      "post": {
+        "tags": [
+          "Authentication Controller"
+        ],
+        "summary": "Registration new users",
+        "operationId": "registerUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "email",
+                  "name",
+                  "password"
+                ],
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User email",
+                    "example": "example@example.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "User name",
+                    "example": "John Doe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User password",
+                    "example": "secretpassword"
+                  }
+                },
+                "description": "Request off a new user registration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created new user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "User ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "User email"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "User name"
+                    }
+                  },
+                  "description": "Represents a user"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts": {
+      "post": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Add a new post",
+        "operationId": "addPost",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "images",
+                  "text",
+                  "title"
+                ],
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The title of the post"
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "The text of the post"
+                  },
+                  "images": {
+                    "type": "array",
+                    "description": "The images associated with the post",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Post added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Post ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Post title"
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Post text"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "imageIds": {
+                      "type": "array",
+                      "description": "List of image IDs",
+                      "items": {
+                        "type": "integer",
+                        "description": "List of image IDs",
+                        "format": "int64"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "description": "Last update timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Response DTO for a post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authentication": {
+      "post": {
+        "tags": [
+          "Authentication Controller"
+        ],
+        "summary": "User authentication",
+        "operationId": "authentication",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User email",
+                    "example": "example@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User password",
+                    "example": "password"
+                  },
+                  "isRememberMe": {
+                    "type": "boolean",
+                    "description": "Remember me flag"
+                  }
+                },
+                "description": "Authentication request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Access token"
+                    }
+                  },
+                  "description": "Authentication response payload"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/subscriptions": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Get subscriptions",
+        "operationId": "getSubscriptions",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriptions found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "User ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "User name"
+                    }
+                  },
+                  "description": "Represents a short user"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No subscriptions found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "User ID",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "User name"
+                      }
+                    },
+                    "description": "Represents a short user"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/messages/{messageId}": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Get a message by ID",
+        "operationId": "getMessageById",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "The ID of the message",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Message ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Message text",
+                      "example": "Hello, how are you?"
+                    },
+                    "sender": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "recipient": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Represents a response message"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Message not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/messages/outgoing": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Get outgoing messages by user",
+        "operationId": "getOutMessagesByUser",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The starting index of messages to retrieve",
+            "required": true,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The number of messages to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Message ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Message text",
+                      "example": "Hello, how are you?"
+                    },
+                    "sender": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "recipient": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Represents a response message"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No messages found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Message ID",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "Message text",
+                        "example": "Hello, how are you?"
+                      },
+                      "sender": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "description": "Creation timestamp",
+                        "format": "date-time"
+                      }
+                    },
+                    "description": "Represents a response message"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/messages/main": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Get messages between users",
+        "operationId": "getMessagesBetweenUsers",
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "query",
+            "description": "The ID of the friend",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The starting index of messages to retrieve",
+            "required": true,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The number of messages to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Message ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Message text",
+                      "example": "Hello, how are you?"
+                    },
+                    "sender": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "recipient": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Represents a response message"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No messages found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Message ID",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "Message text",
+                        "example": "Hello, how are you?"
+                      },
+                      "sender": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "description": "Creation timestamp",
+                        "format": "date-time"
+                      }
+                    },
+                    "description": "Represents a response message"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/messages/income": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Get incoming messages by user",
+        "operationId": "getInMessagesByUser",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The starting index of messages to retrieve",
+            "required": true,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The number of messages to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Message ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Message text",
+                      "example": "Hello, how are you?"
+                    },
+                    "sender": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "recipient": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Represents a response message"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No messages found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Message ID",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "Message text",
+                        "example": "Hello, how are you?"
+                      },
+                      "sender": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "description": "Creation timestamp",
+                        "format": "date-time"
+                      }
+                    },
+                    "description": "Represents a response message"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/friends": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Get friends",
+        "operationId": "getFriends",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Friends found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "User ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "User name"
+                    }
+                  },
+                  "description": "Represents a short user"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No friends found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "User ID",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "User name"
+                      }
+                    },
+                    "description": "Represents a short user"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{postId}/images/{imageId}": {
+      "get": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Download an image associated with a post",
+        "operationId": "downloadImage",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "imageId",
+            "in": "path",
+            "description": "The ID of the image",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image downloaded successfully",
+            "content": {
+              "image/*": {}
+            }
+          },
+          "404": {
+            "description": "Post or image not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/subscriptions": {
+      "get": {
+        "tags": [
+          "Post Controller"
+        ],
+        "summary": "Get posts for a subscriber",
+        "operationId": "getPostsForSubscriber",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "The authorization token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer <token>"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The starting index of posts to retrieve",
+            "required": true,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The number of posts to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posts found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Post ID",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Post title"
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Post text"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "format": "int64",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "User name"
+                        }
+                      },
+                      "description": "Represents a short user"
+                    },
+                    "imageIds": {
+                      "type": "array",
+                      "description": "List of image IDs",
+                      "items": {
+                        "type": "integer",
+                        "description": "List of image IDs",
+                        "format": "int64"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "description": "Last update timestamp",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Response DTO for a post"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No posts found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Post ID",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "Post title"
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "Post text"
+                      },
+                      "user": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID",
+                            "format": "int64",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "User name"
+                          }
+                        },
+                        "description": "Represents a short user"
+                      },
+                      "imageIds": {
+                        "type": "array",
+                        "description": "List of image IDs",
+                        "items": {
+                          "type": "integer",
+                          "description": "List of image IDs",
+                          "format": "int64"
+                        }
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "description": "Creation timestamp",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "description": "Last update timestamp",
+                        "format": "date-time"
+                      }
+                    },
+                    "description": "Response DTO for a post"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Error status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp when the error occurred"
+                    }
+                  },
+                  "description": "Represents an API error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "status": {
+            "type": "string",
+            "description": "Error status"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Timestamp when the error occurred"
+          }
+        },
+        "description": "Represents an API error"
+      },
+      "Friendship": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "description": "User ID",
+            "format": "int64"
+          },
+          "friendId": {
+            "type": "integer",
+            "description": "Friend ID",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "description": "Friendship status",
+            "enum": [
+              "SUBSCRIBE",
+              "FRIENDSHIP",
+              "DECLINE"
+            ]
+          }
+        },
+        "description": "Friendship entity"
+      },
+      "ResponsePost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Post ID",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Post title"
+          },
+          "text": {
+            "type": "string",
+            "description": "Post text"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "User ID",
+                "format": "int64",
+                "example": 1
+              },
+              "name": {
+                "type": "string",
+                "description": "User name"
+              }
+            },
+            "description": "Represents a short user"
+          },
+          "imageIds": {
+            "type": "array",
+            "description": "List of image IDs",
+            "items": {
+              "type": "integer",
+              "description": "List of image IDs",
+              "format": "int64"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last update timestamp",
+            "format": "date-time"
+          }
+        },
+        "description": "Response DTO for a post"
+      },
+      "UserShortDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "User ID",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "User name"
+          }
+        },
+        "description": "Represents a short user"
+      },
+      "NewMessage": {
+        "required": [
+          "recipientId",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "recipientId": {
+            "type": "integer",
+            "description": "Recipient identifier",
+            "format": "int64"
+          },
+          "text": {
+            "type": "string",
+            "description": "Message text"
+          }
+        },
+        "description": "The new message object"
+      },
+      "ResponseMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Message ID",
+            "format": "int64",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "description": "Message text",
+            "example": "Hello, how are you?"
+          },
+          "sender": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "User ID",
+                "format": "int64",
+                "example": 1
+              },
+              "name": {
+                "type": "string",
+                "description": "User name"
+              }
+            },
+            "description": "Represents a short user"
+          },
+          "recipient": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "User ID",
+                "format": "int64",
+                "example": 1
+              },
+              "name": {
+                "type": "string",
+                "description": "User name"
+              }
+            },
+            "description": "Represents a short user"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "format": "date-time"
+          }
+        },
+        "description": "Represents a response message"
+      },
+      "RegistrationRequest": {
+        "required": [
+          "email",
+          "name",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email",
+            "example": "example@example.com"
+          },
+          "name": {
+            "type": "string",
+            "description": "User name",
+            "example": "John Doe"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "example": "secretpassword"
+          }
+        },
+        "description": "Request off a new user registration"
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "User ID",
+            "format": "int64",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "description": "User email"
+          },
+          "name": {
+            "type": "string",
+            "description": "User name"
+          }
+        },
+        "description": "Represents a user"
+      },
+      "AuthenticationRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email",
+            "example": "example@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "example": "password"
+          },
+          "isRememberMe": {
+            "type": "boolean",
+            "description": "Remember me flag"
+          }
+        },
+        "description": "Authentication request"
+      },
+      "AuthenticationResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Access token"
+          }
+        },
+        "description": "Authentication response payload"
+      }
+    }
+  }
+}
