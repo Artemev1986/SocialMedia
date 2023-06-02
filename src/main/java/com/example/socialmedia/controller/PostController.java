@@ -2,9 +2,17 @@ package com.example.socialmedia.controller;
 
 import com.example.socialmedia.dto.*;
 import com.example.socialmedia.entity.Image;
+import com.example.socialmedia.exception.ApiError;
 import com.example.socialmedia.security.JwtProvider;
 import com.example.socialmedia.service.ImageService;
 import com.example.socialmedia.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -22,6 +30,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+@Tag(name = "Post Controller", description = "API endpoints for managing posts and images")
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -31,13 +42,29 @@ public class PostController {
     private final PostService postService;
     private final ImageService imageService;
     private final JwtProvider jwtProvider;
-    private static final String AUTHORIZATION = "Authorization";
 
 
+    @Operation(summary = "Add a new post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Post added successfully",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponsePost.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
     @PostMapping
-    ResponseEntity<ResponsePost> addPost(@RequestPart @NotBlank String title,
+    ResponseEntity<ResponsePost> addPost(@Parameter(description = "The title of the post", required = true)
+                                         @RequestPart @NotBlank String title,
+                                         @Parameter(description = "The text of the post", required = true)
                                          @RequestPart @NotBlank String text,
+                                         @Parameter(description = "The images associated with the post")
                                          @RequestPart MultipartFile[] images,
+                                         @Parameter(description = "The authorization token", required = true,
+                                                 example = "Bearer <token>")
                                          @RequestHeader(AUTHORIZATION) String token) throws IOException {
 
         RequestPost newPost = new RequestPost();
@@ -49,12 +76,31 @@ public class PostController {
         return new ResponseEntity<>(postDto, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Update an existing post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post updated successfully",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponsePost.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
     @PutMapping("/{postId}")
-    public ResponseEntity<ResponsePost> updatePost(@PathVariable Long postId,
-                                                   @RequestPart(required = false) @NotBlank String title,
-                                                   @RequestPart(required = false) @NotBlank String text,
-                                                   @RequestPart(required = false) MultipartFile[] images,
-                                                   @RequestParam(required = false) Long[] deleteImageIds,
+    public ResponseEntity<ResponsePost> updatePost(@Parameter(description = "The ID of the post", required = true)
+                                                       @PathVariable Long postId,
+                                                   @Parameter(description = "The updated title of the post")
+                                                       @RequestPart(required = false) @NotBlank String title,
+                                                   @Parameter(description = "The updated text of the post")
+                                                       @RequestPart(required = false) @NotBlank String text,
+                                                   @Parameter(description = "The updated images associated with the post")
+                                                       @RequestPart(required = false) MultipartFile[] images,
+                                                   @Parameter(description = "The IDs of images to delete")
+                                                       @RequestParam(required = false) Long[] deleteImageIds,
+                                                   @Parameter(description = "The authorization token", required = true,
+                                                           example = "Bearer <token>")
                                                    @RequestHeader(AUTHORIZATION) String token) throws IOException {
 
         RequestPost updatePost = new RequestPost();
@@ -68,17 +114,39 @@ public class PostController {
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get a post by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponsePost.class)) }),
+            @ApiResponse(responseCode = "404", description = "Post not found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
     @GetMapping("/{postId}")
-    public ResponseEntity<ResponsePost> getPostById(@PathVariable Long postId) {
+    public ResponseEntity<ResponsePost> getPostById(
+            @Parameter(description = "The ID of the post", required = true)
+            @PathVariable Long postId) {
 
         ResponsePost responsePost = postService.findById(postId);
 
         return new ResponseEntity<>(responsePost, HttpStatus.OK);
     }
 
+    @Operation(summary = "Download an image associated with a post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Image downloaded successfully",
+                    content = { @Content(mediaType = "image/*") }),
+            @ApiResponse(responseCode = "404", description = "Post or image not found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
     @GetMapping("/{postId}/images/{imageId}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable Long postId,
-                                                  @PathVariable Long imageId) {
+    public ResponseEntity<Resource> downloadImage(
+            @Parameter(description = "The ID of the post", required = true)
+            @PathVariable Long postId,
+            @Parameter(description = "The ID of the image", required = true)
+            @PathVariable Long imageId) {
 
         Image image = imageService.getById(imageId, postId);
 
@@ -90,9 +158,24 @@ public class PostController {
                     .body(resource);
     }
 
+    @Operation(summary = "Delete a post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) }),
+            @ApiResponse(responseCode = "404", description = "Post not found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@RequestHeader(AUTHORIZATION) String token,
-                                           @PathVariable Long postId) {
+    public ResponseEntity<Void> deletePost(
+            @Parameter(
+            description = "The authorization token", required = true,
+            example = "Bearer <token>")
+            @RequestHeader(name = "Authorization") String token,
+            @Parameter(description = "The ID of the post", required = true)
+    @PathVariable Long postId) {
 
         String email = jwtProvider.getEmailFromToken(token.substring(7));
         postService.deletePostById(postId, email);
@@ -100,10 +183,28 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Get posts for a subscriber")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponsePost.class)) }),
+            @ApiResponse(responseCode = "204", description = "No posts found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
     @GetMapping("/subscriptions")
-    public ResponseEntity<List<ResponsePost>> getPostsForSubscriber(@RequestHeader(AUTHORIZATION) String token,
-                                                                    @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                                    @Positive @RequestParam(defaultValue = "10") Integer size) {
+    public ResponseEntity<List<ResponsePost>> getPostsForSubscriber(
+            @Parameter(description = "The authorization token", required = true,
+            example = "Bearer <token>")
+            @RequestHeader(name = "Authorization") String token,
+            @Parameter(description = "The starting index of posts to retrieve", required = true, example = "0")
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Parameter(description = "The number of posts to retrieve", required = true, example = "10")
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
 
         String email = jwtProvider.getEmailFromToken(token.substring(7));
         List<ResponsePost> posts = postService.getPostsForSubscriber(email, from, size);
