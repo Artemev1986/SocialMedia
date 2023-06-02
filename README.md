@@ -25,7 +25,6 @@ The application is built using Java 17 and Spring Boot, along with several other
 - **Lombok**
 - **Swagger(OpenAPI 3.0)**
 
-
 ### How to run this project :
 
 #### Firstly one need to install PostgreSQL and create "social-media" database in it.
