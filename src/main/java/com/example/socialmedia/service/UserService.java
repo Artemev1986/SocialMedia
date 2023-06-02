@@ -83,7 +83,7 @@ public class UserService {
         log.debug("user {} decline friendship by user with id {}", user, friendId);
     }
 
-    public List<UserShortDto> friends(String email) {
+    public List<UserShortDto> getFriends(String email) {
         User user = userRepository.findByEmail(email);
         List<Long> friendIds = friendshipRepository.getFriendsByUserId(user.getId());
         List<UserShortDto> friends = userRepository.getUsersByUserList(friendIds).stream()
@@ -92,7 +92,7 @@ public class UserService {
         return friends;
     }
 
-    public List<UserShortDto> subscriptions(String email) {
+    public List<UserShortDto> getSubscriptions(String email) {
         User user = userRepository.findByEmail(email);
         List<Long> subscriptionIds = friendshipRepository.getSubscriptionsByUserId(user.getId());
         List<UserShortDto> subscriptions = userRepository.getUsersByUserList(subscriptionIds).stream()

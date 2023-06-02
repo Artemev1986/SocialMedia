@@ -45,7 +45,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid id supplied",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class)) }) })
-    @PostMapping("/registration")
+    @PostMapping("/api/registration")
     public ResponseEntity<UserDto> registerUser(
             @Parameter(description = "Request off a new user registration")
             @RequestBody @Valid RegistrationRequest registrationRequest) {
@@ -66,7 +66,7 @@ public class AuthController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class)) })
     })
-    @PostMapping("/authentication")
+    @PostMapping("/api/authentication")
     public ResponseEntity<AuthenticationResponse> authentication(
             @Parameter(description = "Authentication request")
             @RequestBody @Valid AuthenticationRequest request) {

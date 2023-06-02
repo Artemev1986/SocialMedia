@@ -88,112 +88,112 @@ class UserControllerTest {
     @Sql("classpath:cleanup-script.sql")
     @Test
     void toSubscribeAndSendMessageTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isForbidden());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isForbidden());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void toFriendAndSendMessageTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performFriendshipRequest("/users/friends/1", tokenForUser2, friendship2, status().isOk());
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser1, message2, status().isForbidden());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/1", tokenForUser2, friendship2, status().isOk());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message2, status().isForbidden());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void declineFriendshipAndSendMessageTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performFriendshipRequest("/users/friends/1", tokenForUser2, friendship2, status().isOk());
-        performFriendshipDecline("/users/friends/1",  tokenForUser2, status().isOk());
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isForbidden());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/1", tokenForUser2, friendship2, status().isOk());
+        performFriendshipDecline("/api/users/friends/1",  tokenForUser2, status().isOk());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isForbidden());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void getMessageTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performFriendshipRequest("/users/friends/1", tokenForUser2, friendship2, status().isOk());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/1", tokenForUser2, friendship2, status().isOk());
 
         message1 = new NewMessage(2L, "message1");
         message2 = new NewMessage(1L, "message2");
         message3 = new NewMessage(2L, "message3");
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser2, message2, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser1, message3, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser2, message2, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message3, status().isCreated());
 
         responseMessage2 = new ResponseMessage(2L, "message2", new UserShortDto(2L, "Alex"), new UserShortDto(1L, "Mik"), LocalDateTime.now());
 
-        performGetMessage("/users/messages/2", tokenForUser1, responseMessage2,
+        performGetMessage("/api/users/messages/2", tokenForUser1, responseMessage2,
                 status().isOk());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void getMessagesMainTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performFriendshipRequest("/users/friends/1", tokenForUser2, friendship2, status().isOk());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/1", tokenForUser2, friendship2, status().isOk());
 
         message1 = new NewMessage(2L, "message1");
         message2 = new NewMessage(1L, "message2");
         message3 = new NewMessage(2L, "message3");
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser2, message2, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser1, message3, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser2, message2, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message3, status().isCreated());
 
         responseMessage1 = new ResponseMessage(1L, "message1", new UserShortDto(1L, "Mik"), new UserShortDto(2L, "Alex"), LocalDateTime.now());
         responseMessage2 = new ResponseMessage(2L, "message2", new UserShortDto(2L, "Alex"), new UserShortDto(1L, "Mik"), LocalDateTime.now());
         responseMessage3 = new ResponseMessage(3L, "message3", new UserShortDto(1L, "Mik"), new UserShortDto(2L, "Alex"), LocalDateTime.now());
         messageList = List.of(responseMessage1, responseMessage2, responseMessage3);
 
-        performGetMessagesMain("/users/messages/main", tokenForUser1, 2L, messageList,
+        performGetMessagesMain("/api/users/messages/main", tokenForUser1, 2L, messageList,
                 status().isOk());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void getMessagesInTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performFriendshipRequest("/users/friends/1", tokenForUser2, friendship2, status().isOk());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/1", tokenForUser2, friendship2, status().isOk());
 
         message1 = new NewMessage(2L, "message1");
         message2 = new NewMessage(1L, "message2");
         message3 = new NewMessage(2L, "message3");
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser2, message2, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser1, message3, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser2, message2, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message3, status().isCreated());
 
         responseMessage2 = new ResponseMessage(2L, "message2", new UserShortDto(2L, "Alex"), new UserShortDto(1L, "Mik"), LocalDateTime.now());
         messageList = List.of(responseMessage2);
 
-        performGetMessagesInOut("/users/messages/income", tokenForUser1, messageList,
+        performGetMessagesInOut("/api/users/messages/income", tokenForUser1, messageList,
                 status().isOk());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void getMessagesOutTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
-        performFriendshipRequest("/users/friends/1", tokenForUser2, friendship2, status().isOk());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/1", tokenForUser2, friendship2, status().isOk());
 
         message1 = new NewMessage(2L, "message1");
         message2 = new NewMessage(1L, "message2");
         message3 = new NewMessage(2L, "message3");
-        performMessageSend("/users/messages", tokenForUser1, message1, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser2, message2, status().isCreated());
-        performMessageSend("/users/messages", tokenForUser1, message3, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message1, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser2, message2, status().isCreated());
+        performMessageSend("/api/users/messages", tokenForUser1, message3, status().isCreated());
 
         responseMessage1 = new ResponseMessage(1L, "message1", new UserShortDto(1L, "Mik"), new UserShortDto(2L, "Alex"), LocalDateTime.now());
         responseMessage3 = new ResponseMessage(3L, "message3", new UserShortDto(1L, "Mik"), new UserShortDto(2L, "Alex"), LocalDateTime.now());
         messageList = List.of(responseMessage1, responseMessage3);
 
-        performGetMessagesInOut("/users/messages/outgoing", tokenForUser1, messageList,
+        performGetMessagesInOut("/api/users/messages/outgoing", tokenForUser1, messageList,
                 status().isOk());
     }
 
     private String registerUserAndGetToken(RegistrationRequest registrationRequest) throws Exception {
-        mockMvc.perform(post("/registration")
+        mockMvc.perform(post("/api/registration")
                         .content(objectMapper.writeValueAsString(registrationRequest))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

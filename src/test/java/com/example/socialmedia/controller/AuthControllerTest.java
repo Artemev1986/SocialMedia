@@ -64,7 +64,7 @@ class AuthControllerTest {
         user.setId(1L);
         UserDto userDto = UserMapper.INSTANCE.toUserDto(user);
 
-        mockMvc.perform(post("/registration")
+        mockMvc.perform(post("/api/registration")
                         .content(objectMapper.writeValueAsString(newUser))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,7 +85,7 @@ class AuthControllerTest {
                 .when(jwtProvider.createToken(Mockito.any(), Mockito.anyBoolean()))
                 .thenReturn(token);
 
-        mockMvc.perform(post("/authentication")
+        mockMvc.perform(post("/api/authentication")
                         .content(objectMapper.writeValueAsString(authenticationRequest))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ class AuthControllerTest {
         user.setId(1L);
         UserDto userDto = UserMapper.INSTANCE.toUserDto(user);
 
-        mockMvc.perform(post("/registration")
+        mockMvc.perform(post("/api/registration")
                         .content(objectMapper.writeValueAsString(newUser))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ class AuthControllerTest {
         authenticationRequest.setEmail(newUser.getEmail());
         authenticationRequest.setPassword("wrong-password");
 
-        mockMvc.perform(post("/authentication")
+        mockMvc.perform(post("/api/authentication")
                         .content(objectMapper.writeValueAsString(authenticationRequest))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -134,14 +134,14 @@ class AuthControllerTest {
         newUser.setEmail("mik@mail.ru");
         newUser.setPassword("password");
 
-        mockMvc.perform(post("/registration")
+        mockMvc.perform(post("/api/registration")
                         .content(objectMapper.writeValueAsString(newUser))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/registration")
+        mockMvc.perform(post("/api/registration")
                         .content(objectMapper.writeValueAsString(newUser))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -156,7 +156,7 @@ class AuthControllerTest {
         authenticationRequest.setEmail("test@mail.ru");
         authenticationRequest.setPassword("password");
 
-        mockMvc.perform(post("/authentication")
+        mockMvc.perform(post("/api/authentication")
                         .content(objectMapper.writeValueAsString(authenticationRequest))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

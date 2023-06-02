@@ -1,7 +1,6 @@
 package com.example.socialmedia.controller;
 
 import com.example.socialmedia.exception.ApiError;
-import com.example.socialmedia.exception.CurrencyNotValidException;
 import com.example.socialmedia.exception.ForbiddenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class ErrorHandler {
     private final ApiError apiError = new ApiError();
 
-    @ExceptionHandler(value = {MethodArgumentNotValidException.class, CurrencyNotValidException.class})
+    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public ResponseEntity<?> handleMethodArgumentNotValid(final Throwable e) {
         apiError.setMessage(e.getMessage());
         apiError.setStatus("BAD_REQUEST");

@@ -21,7 +21,7 @@ public final class LogInUtils {
         authenticationRequest.setEmail(email);
         authenticationRequest.setPassword(password);
 
-        String content = mockMvc.perform(post("/authentication")
+        String content = mockMvc.perform(post("/api/authentication")
                         .content(OBJECT_MAPPER.writeValueAsString(authenticationRequest))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

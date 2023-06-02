@@ -32,7 +32,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/api/users")
 @Validated
 public class UserController {
 
@@ -64,6 +64,25 @@ public class UserController {
         return new ResponseEntity<>(friendship, HttpStatus.OK);
     }
 
+    @Operation(summary = "Decline a friendship")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Friendship declined successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)) })
+    })
+    @DeleteMapping("/friends/{friendId}")
+    public ResponseEntity<?> declineFriendship(
+            @Parameter(description = "The ID of the friend", required = true)
+            @PathVariable long friendId,
+            @Parameter(description = "The authorization token", required = true, example = "Bearer <token>")
+            @RequestHeader(AUTHORIZATION) String token) {
+
+        String email = jwtProvider.getEmailFromToken(token.substring(7));
+        userService.declineFriendship(email, friendId);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "Get friends")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Friends found",
@@ -80,7 +99,7 @@ public class UserController {
             @RequestHeader(AUTHORIZATION) String token) {
 
         String email = jwtProvider.getEmailFromToken(token.substring(7));
-        List<UserShortDto> friends = userService.friends(email);
+        List<UserShortDto> friends = userService.getFriends(email);
         if (friends.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
         }
@@ -104,30 +123,11 @@ public class UserController {
             @RequestHeader(AUTHORIZATION) String token) {
 
         String email = jwtProvider.getEmailFromToken(token.substring(7));
-        List<UserShortDto> subscriptions = userService.subscriptions(email);
+        List<UserShortDto> subscriptions = userService.getSubscriptions(email);
         if (subscriptions.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(subscriptions, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Decline a friendship")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Friendship declined successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized",
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiError.class)) })
-    })
-    @DeleteMapping("/friends/{friendId}")
-    public ResponseEntity<?> declineFriendship(
-            @Parameter(description = "The ID of the friend", required = true)
-            @PathVariable long friendId,
-            @Parameter(description = "The authorization token", required = true, example = "Bearer <token>")
-            @RequestHeader(AUTHORIZATION) String token) {
-
-        String email = jwtProvider.getEmailFromToken(token.substring(7));
-        userService.declineFriendship(email, friendId);
-        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Send a message")

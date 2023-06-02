@@ -86,7 +86,7 @@ class PostControllerTest {
 
         ResponsePost responsePost = new ResponsePost(1L, "title1", "text1",
                 new UserShortDto(1L, "Mik"), List.of(1L, 2L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
+        performAddPost("/api/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
     }
 
     @Sql("classpath:cleanup-script.sql")
@@ -102,11 +102,11 @@ class PostControllerTest {
 
         ResponsePost responsePost = new ResponsePost(1L, "title1", "text1",
                 new UserShortDto(1L, "Mik"), List.of(1L, 2L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
+        performAddPost("/api/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
 
         ResponsePost responsePostUpdate = new ResponsePost(1L, "title2", "text2",
                 new UserShortDto(1L, "Mik"), List.of(2L), responsePost.getCreatedAt(), LocalDateTime.now());
-        performUpdatePost("/posts/1", tokenForUser1,"title2", "text2", status().isOk(), responsePostUpdate);
+        performUpdatePost("/api/posts/1", tokenForUser1,"title2", "text2", status().isOk(), responsePostUpdate);
     }
 
     @Sql("classpath:cleanup-script.sql")
@@ -122,9 +122,9 @@ class PostControllerTest {
 
         ResponsePost responsePost = new ResponsePost(1L, "title1", "text1",
                 new UserShortDto(1L, "Mik"), List.of(1L, 2L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
+        performAddPost("/api/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
 
-        performGetPost("/posts/1", tokenForUser1, responsePost, status().isOk());
+        performGetPost("/api/posts/1", tokenForUser1, responsePost, status().isOk());
     }
 
     @Sql("classpath:cleanup-script.sql")
@@ -140,10 +140,10 @@ class PostControllerTest {
 
         ResponsePost responsePost = new ResponsePost(1L, "title1", "text1",
                 new UserShortDto(1L, "Mik"), List.of(1L, 2L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
+        performAddPost("/api/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
 
         ByteArrayResource resource = new ByteArrayResource(file1.getBytes());
-        performGetImage("/posts/1/images/1", tokenForUser1, resource, status().isOk());
+        performGetImage("/api/posts/1/images/1", tokenForUser1, resource, status().isOk());
     }
 
     @Sql("classpath:cleanup-script.sql")
@@ -159,15 +159,15 @@ class PostControllerTest {
 
         ResponsePost responsePost = new ResponsePost(1L, "title1", "text1",
                 new UserShortDto(1L, "Mik"), List.of(1L, 2L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
+        performAddPost("/api/posts", tokenForUser1, "title1", "text1", files, status().isCreated(), responsePost);
 
-        performDeletePost("/posts/1", tokenForUser1, status().isOk());
+        performDeletePost("/api/posts/1", tokenForUser1, status().isOk());
     }
 
     @Sql("classpath:cleanup-script.sql")
     @Test
     void getPostsFromSubsTest() throws Exception {
-        performFriendshipRequest("/users/friends/2", tokenForUser1, friendship1, status().isOk());
+        performFriendshipRequest("/api/users/friends/2", tokenForUser1, friendship1, status().isOk());
 
         MockMultipartFile file1 = new MockMultipartFile("images","image1.png",
                 String.valueOf(MediaType.IMAGE_PNG),"test data image!".getBytes()
@@ -176,20 +176,20 @@ class PostControllerTest {
 
         ResponsePost responsePost1 = new ResponsePost(1L, "title1", "text1",
                 new UserShortDto(2L, "Alex"), List.of(1L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser2, "title1", "text1", files, status().isCreated(), responsePost1);
+        performAddPost("/api/posts", tokenForUser2, "title1", "text1", files, status().isCreated(), responsePost1);
 
         ResponsePost responsePost2 = new ResponsePost(2L, "title1", "text1",
                 new UserShortDto(2L, "Alex"), List.of(2L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser2, "title1", "text1", files, status().isCreated(), responsePost2);
+        performAddPost("/api/posts", tokenForUser2, "title1", "text1", files, status().isCreated(), responsePost2);
         ResponsePost responsePost3 = new ResponsePost(3L, "title1", "text1",
                 new UserShortDto(3L, "Oleg"), List.of(3L), LocalDateTime.now(), null);
-        performAddPost("/posts", tokenForUser3, "title1", "text1", files, status().isCreated(), responsePost3);
+        performAddPost("/api/posts", tokenForUser3, "title1", "text1", files, status().isCreated(), responsePost3);
         List<ResponsePost> posts = List.of(responsePost2, responsePost1);
-        performGetPosts("/posts/subscriptions", tokenForUser1, posts, status().isOk());
+        performGetPosts("/api/posts/subscriptions", tokenForUser1, posts, status().isOk());
     }
 
     private String registerUserAndGetToken(RegistrationRequest registrationRequest) throws Exception {
-        mockMvc.perform(post("/registration")
+        mockMvc.perform(post("/api/registration")
                         .content(objectMapper.writeValueAsString(registrationRequest))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
