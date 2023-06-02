@@ -47,3 +47,4 @@ After that one can run the project with the command:
 mvn spring-boot:run
 ```
 Access the API documentation at http://localhost:8080/swagger-ui.html
+or here [Swagger service specification](social.json)</br>
